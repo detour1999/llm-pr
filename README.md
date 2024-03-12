@@ -30,17 +30,14 @@ Before you begin, ensure you have the following installed:
 
 ### [llm](https://llm.datasette.io/en/stable/)
   #### Install
-    ```pip install llm```
-    or
-    ```brew install llm```
-    or
-    ```pipx install llm```
+
+```pip install llm``` or ```brew install llm``` or ```pipx install llm```
 
   #### After installation:
-    ```
-    # Paste your OpenAI API key into this
-    llm keys set openai
-    ```
+```
+# Paste your OpenAI API key into this
+llm keys set openai
+```
 
 ## Functionality
 
@@ -62,14 +59,7 @@ To use the script, you may need to make it executable with `chmod +x` and then y
 ./pr.sh
 ```
 
-To ensure the `pr-helper` tool is easily accessible from any location on your system, you may create a symbolic link (`symlink`) to the `pr.sh` script in a directory that's included in your `PATH`. This can be done by running the following command in your terminal:
-
-```bash
-ln -s /path/to/pr-helper/pr.sh /usr/local/bin/pr-helper
-```
-Note that if you want to make your script available system-wide (for all users), you'll need to move or link it to a system directory like `/usr/local/bin` (as shown above). If you only want it available for your user account, you can use `~/bin` instead.
-
-With this symlink in place, you can run `pr-helper` from any directory without needing to specify the full path to the script.
+To ensure the `pr-helper` tool is easily accessible from any location on your system, you may create a symbolic link (`symlink`) to the `pr.sh` script in a directory that's included in your `PATH`. Alternatively, add the directory with the script to your `PATH`.
 
 Ensure that your `~/.config/prompts/` directory contains the required `pr-title-prompt.txt` and `pr-body-prompt.txt` files for the `llm` tool to work correctly.
 
