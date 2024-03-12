@@ -54,7 +54,7 @@ HEAD_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 spin_animation "Generating PR Title" &
 spin_pid=$!
 # Generate the title and body using git diff and llm
-TITLE=$(git diff $HEAD_BRANCH $GITHUB_REMOTE/$BASE_BRANCH | llm -s "$(cat ~/.config/prompts/pr-title-prompt.txt)")
+TITLE=$(git diff $GITHUB_REMOTE/$BASE_BRANCH $GITHUB_REMOTE/$HEAD_BRANCH | llm -s "$(cat ~/.config/prompts/pr-title-prompt.txt)")
 # Stop the spinning animation
 kill $spin_pid
 wait $spin_pid 2>/dev/null
@@ -62,7 +62,7 @@ wait $spin_pid 2>/dev/null
 # Start the spinning animation
 spin_animation "Generating PR Body" &
 spin_pid=$!
-BODY=$(git diff $HEAD_BRANCH $GITHUB_REMOTE/$BASE_BRANCH| llm -s "$(cat ~/.config/prompts/pr-body-prompt.txt)")
+BODY=$(git diff $GITHUB_REMOTE/$BASE_BRANCH $GITHUB_REMOTE/$HEAD_BRANCH| llm -s "$(cat ~/.config/prompts/pr-body-prompt.txt)")
 if [ $? -ne 0 ]; then
   echo -e "${RED}Something went wrong with the LLM generation!${NC}"
   echo -e "${YELLOW}It's probably just your quota - maybe chill for a minute${NC}"
@@ -75,7 +75,7 @@ tput cnorm
 echo
 
 # Create the pull request
-echo gh pr create \
+gh pr create \
   --repo "$REPO_NAME" \
   --base "$BASE_BRANCH" \
   --head "$HEAD_BRANCH" \
