@@ -75,15 +75,29 @@ wait $spin_pid 2>/dev/null
 tput cnorm
 echo
 
+
+
 if [ "$IS_GITHUB" == "true" ]; then
-  echo -e "${YELLOW}Creating the PR on ${REPO_NAME}.${NC}"
-  # Create the pull request
-  gh pr create \
-  --repo "$REPO_NAME" \
-  --base "$BASE_BRANCH" \
-  --head "$HEAD_BRANCH" \
-  --title "$TITLE" \
-  --body "$BODY"
+    # Check if there is an existing PR for the current branch
+    EXISTING_PR=$(gh pr list --repo "$REPO_NAME" --head "$HEAD_BRANCH" --json number --jq '.[0].number')
+
+    if [ -n "$EXISTING_PR" ]; then
+    echo -e "${YELLOW}Updating the existing PR (#$EXISTING_PR) on ${REPO_NAME}.${NC}"
+    # Update the existing pull request
+    gh pr edit "$EXISTING_PR" \
+    --repo "$REPO_NAME" \
+    --title "$TITLE" \
+    --body "$BODY"
+    else
+    echo -e "${YELLOW}No existing PR found, creating a new one.${NC}"
+    # Create the pull request
+    gh pr create \
+    --repo "$REPO_NAME" \
+    --base "$BASE_BRANCH" \
+    --head "$HEAD_BRANCH" \
+    --title "$TITLE" \
+    --body "$BODY"
+    fi
 else
   echo -e "${YELLOW}Not github, not creating the PR automatically.${NC}"
 fi
