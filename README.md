@@ -59,6 +59,18 @@ To use the script, you may need to make it executable with `chmod +x` and then y
 ```
 To ensure the `pr-helper` tool is easily accessible from any location on your system, you may create a symbolic link (`symlink`) to the `pr.sh` script in a directory that's included in your `PATH`. Alternatively, add the directory with the script to your `PATH`.
 
+For an extra cool trick, add a git alias:
+
+```
+git config --global alias.pr '!pr.sh'
+```
+then your flow can be like so:
+```
+git ci -a
+git push
+git pr
+```
+
 ## Customization
 
 The `llm` tool uses separate `.txt` files for PR titles and bodies, so they can be adapted to your needs.
