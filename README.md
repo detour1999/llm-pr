@@ -1,5 +1,5 @@
-# PR Helper
-PR Helper is an automated tool designed to simplify the process of creating pull requests for developers. It uses language models via the `llm` command-line tool to analyze the changes introduced in a Git branch and generates a concise and informative title and body for the pull request.
+# LLM PR Helper
+LLM PR Helper is an automated tool designed to simplify the process of creating pull requests for developers. It uses language models via the `llm` command-line tool to analyze the changes introduced in a Git branch and generates a concise and informative title and body for the pull request.
 
 ## Table of Contents
 1. [Prerequisites](#prerequisites)
@@ -57,7 +57,7 @@ To use the script, you may need to make it executable with `chmod +x` and then y
 ```bash
 ./pr.sh
 ```
-To ensure the `pr-helper` tool is easily accessible from any location on your system, you may create a symbolic link (`symlink`) to the `pr.sh` script in a directory that's included in your `PATH`. Alternatively, add the directory with the script to your `PATH`.
+To ensure the tool is easily accessible from any location on your system, you may create a symbolic link (`symlink`) to the `pr.sh` script in a directory that's included in your `PATH`. Alternatively, add the directory with the script to your `PATH`.
 
 For an extra cool trick, add a git alias:
 
