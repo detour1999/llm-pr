@@ -32,20 +32,21 @@ fi
 
 # Use a regular expression to find the remote that points to a GitHub URL
 GITHUB_REMOTE=$(echo "$REMOTES" | grep -E '^[^[:space:]]+\s+(https?://github\.com/|git@github\.com:)' | awk '{print $1}' | uniq)
+IS_GITHUB="true"
 
 if [ -z $GITHUB_REMOTE ]; then
-  echo -e "${YELLOW}No github remotes configured for this repo.${NC}"
-  exit 1
+  GITHUB_REMOTE="origin"
+  IS_GITHUB="false"
+  BASE_BRANCH="HEAD"
+else
+    # Get the repository information using the gh tool
+    REPO_INFO=$(gh repo view --json defaultBranchRef,nameWithOwner --jq '{ nameWithOwner: .nameWithOwner, defaultBranchRef: .defaultBranchRef.name }')
+
+    # Check the exit status of the command
+    # Extract the repository owner and name from the JSON output
+    REPO_NAME=$(echo "$REPO_INFO" | jq -r '.nameWithOwner')
+    BASE_BRANCH=$(echo "$REPO_INFO" | jq -r '.defaultBranchRef')
 fi
-
-
-# Get the repository information using the gh tool
-REPO_INFO=$(gh repo view --json defaultBranchRef,nameWithOwner --jq '{ nameWithOwner: .nameWithOwner, defaultBranchRef: .defaultBranchRef.name }')
-
-# Check the exit status of the command
-# Extract the repository owner and name from the JSON output
-REPO_NAME=$(echo "$REPO_INFO" | jq -r '.nameWithOwner')
-BASE_BRANCH=$(echo "$REPO_INFO" | jq -r '.defaultBranchRef')
 
 # Get the current branch name
 HEAD_BRANCH=$(git rev-parse --abbrev-ref HEAD)
@@ -74,14 +75,18 @@ wait $spin_pid 2>/dev/null
 tput cnorm
 echo
 
-# Create the pull request
-gh pr create \
+if [ "$IS_GITHUB" == "true" ]; then
+  echo -e "${YELLOW}Creating the PR on ${REPO_NAME}.${NC}"
+  # Create the pull request
+  gh pr create \
   --repo "$REPO_NAME" \
   --base "$BASE_BRANCH" \
   --head "$HEAD_BRANCH" \
   --title "$TITLE" \
   --body "$BODY"
-
+else
+  echo -e "${YELLOW}Not github, not creating the PR automatically.${NC}"
+fi
 
 # Display the generated commit message with colors and formatting
 echo -e "${BLUE}=== Generated PR Message ===${NC}"
