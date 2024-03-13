@@ -66,7 +66,7 @@ git config --global alias.pr '!pr.sh'
 ```
 then your flow can be like so:
 ```
-git ci -a
+git commit -a
 git push
 git pr
 ```
