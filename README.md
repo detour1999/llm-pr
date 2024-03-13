@@ -53,11 +53,11 @@ Authenticate using `gh auth login`. The `GITHUB_TOKEN` environment variable is a
 
 Set up `~/.config/prompts/` with `pr-title-prompt.txt` and `pr-body-prompt.txt`.
 
-Run the following to execute the script:
+To use the script, you may need to make it executable with `chmod +x` and then you can run it directly from your terminal:
 ```bash
 ./pr.sh
 ```
-
+To ensure the `pr-helper` tool is easily accessible from any location on your system, you may create a symbolic link (`symlink`) to the `pr.sh` script in a directory that's included in your `PATH`. Alternatively, add the directory with the script to your `PATH`.
 
 ## Customization
 
