@@ -521,22 +521,37 @@ main() {
   if [ "$IS_GITHUB" == "true" ]; then
     log "INFO" "Checking for existing PR..."
     EXISTING_PR=$(check_existing_pr "$REPO_NAME" "$HEAD_BRANCH")
+    PR_URL=""
+    
     if [ -n "$EXISTING_PR" ]; then
       log "INFO" "Updating the existing PR (#$EXISTING_PR) on ${REPO_NAME}."
       gh pr edit "$EXISTING_PR" --repo "$REPO_NAME" --title "$TITLE" --body "$BODY"
+      PR_URL=$(gh pr view "$EXISTING_PR" --json url --jq .url)
     else
       log "INFO" "No existing PR found, creating a new one."
-      gh pr create --repo "$REPO_NAME" --base "$BASE_BRANCH" --head "$HEAD_BRANCH" --title "$TITLE" --body "$BODY"
+      # Capture the output which contains the URL
+      PR_OUTPUT=$(gh pr create --repo "$REPO_NAME" --base "$BASE_BRANCH" --head "$HEAD_BRANCH" --title "$TITLE" --body "$BODY")
+      PR_URL=$(echo "$PR_OUTPUT" | grep -o 'https://github.com/[^ ]*' | head -1)
+    fi
+    
+    # Display condensed success message with PR link if we have a URL
+    if [ -n "$PR_URL" ]; then
+      echo -e "Pull Request - ${GREEN}$TITLE${NC} created\n${BLUE}$PR_URL${NC}"
+    else
+      # Fallback to displaying the generated content
+      echo -e "${BLUE}=== Generated PR Message ===${NC}"
+      echo -e "${BLUE}Title:${NC}\n${GREEN}$TITLE${NC}\n"
+      echo -e "${BLUE}Body:${NC}\n${GREEN}$BODY${NC}"
+      echo -e "${BLUE}=================================${NC}"
     fi
   else
     log "WARN" "Not GitHub, not creating the PR automatically."
+    # Display the generated PR message for non-GitHub repos
+    echo -e "${BLUE}=== Generated PR Message ===${NC}"
+    echo -e "${BLUE}Title:${NC}\n${GREEN}$TITLE${NC}\n"
+    echo -e "${BLUE}Body:${NC}\n${GREEN}$BODY${NC}"
+    echo -e "${BLUE}=================================${NC}"
   fi
-
-  # Display the generated PR message
-  echo -e "${BLUE}=== Generated PR Message ===${NC}"
-  echo -e "${BLUE}Title:${NC}\n${GREEN}$TITLE${NC}\n"
-  echo -e "${BLUE}Body:${NC}\n${GREEN}$BODY${NC}"
-  echo -e "${BLUE}=================================${NC}"
 
   log "INFO" "Script completed successfully."
 }
