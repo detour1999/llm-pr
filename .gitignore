@@ -1,0 +1,43 @@
+# OS files
+.DS_Store
+Thumbs.db
+.directory
+Desktop.ini
+
+# Editor directories and files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# Python artifacts (if any)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+.env.local
+
+# Dependency directories
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Prompt templates
+prompts/

@@ -3,9 +3,9 @@ LLM PR Helper is an automated tool designed to simplify the process of creating 
 
 ## Table of Contents
 1. [Prerequisites](#prerequisites)
-   - [GitHub CLI (gh)](#github-cli-gh)
    - [llm](#llm)
-2. [Functionality](#functionality)
+   - [GitHub CLI (gh)](#github-cli-gh)
+2. [Features](#features)
 3. [Usage](#usage)
 4. [Customization](#customization)
 5. [Issues and Feedback](#issues-and-feedback)
@@ -13,59 +13,90 @@ LLM PR Helper is an automated tool designed to simplify the process of creating 
 
 ## Prerequisites
 
-### llm
-Install by running one of the commands below:
+The script will check for required dependencies and provide installation instructions if anything is missing.
+
+Required:
+- **git**: Version control system
+- **jq**: Command-line JSON processor
+- **llm**: CLI tool for language models
+
+Optional:
+- **GitHub CLI (gh)**: For creating PRs directly from the command line
+
+### Installation Instructions
+
+#### llm
 ```bash
 pip install llm
+# or
 brew install llm
+# or
 pipx install llm
-```
-After installing:
-```bash
+
+# After installing:
 llm keys set openai
 # Follow the prompts to input your OpenAI API key
 ```
 
-### GitHub CLI (gh) _optional_
-_If not installed, the script won't actually create a Pull Request, but will generate and output a title and body._
+#### GitHub CLI (gh) _optional_
+_If not installed, the script will still generate and output a PR title and body._
 
-Installed using preferred method as per the official [guide](https://github.com/cli/cli#installation).
-
-#### macOS
 ```bash
+# macOS
 brew install gh
-```
-#### Debian/Ubuntu
-```bash
-sudo mkdir -p -m 755 /etc/apt/keyrings && wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
-&& sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
-&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-&& sudo apt update \
-&& sudo apt install gh -y
+
+# Debian/Ubuntu
+sudo apt install gh
+
+# After installing:
+gh auth login
 ```
 
-#### Configuration
-Authenticate using `gh auth login`. The `GITHUB_TOKEN` environment variable is also supported.
 
+## Features
 
+- Automatically generates PR titles and descriptions based on your code changes
+- Smart detection of the correct base branch
+- Option to create draft PRs by adding the [DRAFT] prefix
+- Handles pushing unpushed commits and creating remote branches when needed
+- Supports updating existing PRs
+- Works with GitHub repositories
+- Configurable prompt location through environment variables
+- Helpful dependency checks with clear installation instructions
+- Guided first-time setup experience
 
 ## Usage
 
-Set up `~/.config/prompts/` with `pr-title-prompt.txt` and `pr-body-prompt.txt`.
+1. Run the script and follow the interactive setup:
+   - Choose where to store your prompt templates
+   - Optionally save this location in your shell configuration
+   - Edit the default prompts directly during setup, or use the defaults
+   - You can always edit the prompt files later (see [Customization](#customization))
 
-To use the script, you may need to make it executable with `chmod +x` and then you can run it directly from your terminal:
+2. Make the script executable:
+   ```bash
+   chmod +x pr.sh
+   ```
+
+3. Run directly from your terminal:
+   ```bash
+   ./pr.sh
+   ```
+
+For easier access, either:
+- Add the script directory to your `PATH`
+- Create a symlink in a directory already in your `PATH`:
+  ```bash
+  ln -s $(pwd)/pr.sh /usr/local/bin/pr
+  ```
+
+For the smoothest workflow, create a git alias:
 ```bash
-./pr.sh
-```
-To ensure the tool is easily accessible from any location on your system, you may create a symbolic link (`symlink`) to the `pr.sh` script in a directory that's included in your `PATH`. Alternatively, add the directory with the script to your `PATH`.
-
-For an extra cool trick, add a git alias:
-
-```
 git config --global alias.pr '!pr.sh'
 ```
-then your flow can be like so:
-```
+
+Then your PR workflow becomes:
+```bash
 git commit -a
 git push
 git pr
@@ -73,7 +104,24 @@ git pr
 
 ## Customization
 
-The `llm` tool uses separate `.txt` files for PR titles and bodies, so they can be adapted to your needs.
+The script uses separate prompt files for PR titles and bodies. The interactive setup process:
+
+1. Asks where you want to store your prompts (suggesting `~/.config/prompts/` as default)
+2. Offers to save this preference to your shell config (`.zshrc`, `.bashrc`, or `.profile`)
+3. Shows default templates that you can:
+   - Use as-is (press Enter)
+   - Edit directly during setup (using your $EDITOR if set, or direct input)
+   - Customize later by editing the files
+
+You can always:
+- Edit the prompt files directly to customize them
+- Change the location by setting the `PROMPT_DIR` environment variable:
+
+```bash
+# Example: Use prompts in the current repository
+export PROMPT_DIR="$(pwd)/prompts"
+./pr.sh
+```
 
 ### `pr-title-prompt.txt`
 ```
@@ -107,8 +155,10 @@ What you write will be passed to create a github pull request
 
 ## Issues and Feedback
 
-Report issues or provide feedback at [hi@dylanr.com](mailto:hi@dylanr.com) or via the issue tracker.
+For issues, feature requests, or feedback:
+- Open an issue in the GitHub repository
+- Contact the maintainer at [hi@dylanr.com](mailto:hi@dylanr.com)
 
 ## License
 
-Released under the MIT License, see [LICENSE](LICENSE).
+Released under the MIT License. See [LICENSE](LICENSE) for details.
