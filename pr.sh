@@ -44,10 +44,13 @@ What you write will be passed to create the title of a github pull request'
 
 DEFAULT_BODY_PROMPT='Write a clear, informative pull request message in markdown:
 
+You will receive both commit messages and code changes. Use both to create a comprehensive PR description.
+
 * Remember to mention the files that were changed, and what was changed
 * Start with a summary
 * Explain the "why" behind changes
 * Include a bulleted list to outline all of the changes
+* Look for issue references in commit messages (fixes #123, closes #456, resolves #789, etc.)
 * If there are changes that resolve specified issues add the issues to a list of closed issues
 * If there are no changes, or the input is blank - then return a blank string
 
@@ -328,6 +331,18 @@ generate_diff() {
   git diff $1..$2
 }
 
+generate_commit_data() {
+  local base_branch="$1"
+  local head_branch="$2"
+  
+  # Get commit messages with more detail
+  local commit_messages=$(git log --oneline --no-merges "$base_branch..$head_branch")
+  local diff=$(git diff "$base_branch..$head_branch")
+  
+  # Combine commit messages and diff for better context
+  printf "=== COMMIT MESSAGES ===\n%s\n\n=== CODE CHANGES ===\n%s" "$commit_messages" "$diff"
+}
+
 # GitHub-related functions
 get_github_remote() {
   git remote -v | grep -E '^[^[:space:]]+\s+(https?://github\.com/|git@github\.com:)' | awk '{print $1}' | uniq
@@ -486,16 +501,16 @@ main() {
   log "INFO" "Generating PR title..."
   spin_animation "Generating PR Title" &
   spin_pid=$!
-  DIFF=$(generate_diff "$GITHUB_REMOTE/$BASE_BRANCH" "$GITHUB_REMOTE/$HEAD_BRANCH")
-  if [ -z "$DIFF" ]; then
-    log "ERROR" "No diff found between $BASE_BRANCH and $HEAD_BRANCH"
+  COMMIT_DATA=$(generate_commit_data "$GITHUB_REMOTE/$BASE_BRANCH" "$GITHUB_REMOTE/$HEAD_BRANCH")
+  if [ -z "$COMMIT_DATA" ]; then
+    log "ERROR" "No commit data found between $BASE_BRANCH and $HEAD_BRANCH"
     kill $spin_pid
     wait $spin_pid 2>/dev/null
     tput cnorm
     exit 1
   fi
   
-  TITLE=$(echo "$DIFF" | llm -s "$(cat "$PROMPT_DIR/pr-title-prompt.txt")")
+  TITLE=$(echo "$COMMIT_DATA" | llm -s "$(cat "$PROMPT_DIR/pr-title-prompt.txt")")
   kill $spin_pid
   wait $spin_pid 2>/dev/null
   tput cnorm
@@ -504,7 +519,7 @@ main() {
   log "INFO" "Generating PR body..."
   spin_animation "Generating PR Body" &
   spin_pid=$!
-  BODY=$(echo "$DIFF" | llm -s "$(cat "$PROMPT_DIR/pr-body-prompt.txt")")
+  BODY=$(echo "$COMMIT_DATA" | llm -s "$(cat "$PROMPT_DIR/pr-body-prompt.txt")")
   kill $spin_pid
   wait $spin_pid 2>/dev/null
   tput cnorm
